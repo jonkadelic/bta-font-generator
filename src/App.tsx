@@ -1,6 +1,6 @@
 import { ChangeEvent, ReactNode, useState } from 'react'
 import './App.css'
-import { DEFAULT_PALETTE, Palette } from './Palette'
+import { BLUE_PALETTE, CYAN_PALETTE, DEFAULT_PALETTE, GREEN_PALETTE, Palette, PINK_PALETTE, RED_PALETTE, YELLOW_PALETTE } from './Palette'
 import { buildText } from './TextBuilder'
 import { Jimp, JimpInstance, ResizeStrategy } from 'jimp'
 import { FontCache } from './FontCache'
@@ -15,33 +15,51 @@ function App() {
     )
 }
 
+const LINE_COLORS: Palette[] = [
+    DEFAULT_PALETTE,
+    RED_PALETTE,
+    GREEN_PALETTE,
+    BLUE_PALETTE,
+    YELLOW_PALETTE,
+    CYAN_PALETTE,
+    PINK_PALETTE
+]
+
 function LineGroup(): ReactNode {
-    const [lines, setLines] = useState<{id: number, line: string}[]>([{id: 0, line: ''}])
+    const [lines, setLines] = useState<{id: number, line: string, colorId: number }[]>([{ id: 0, line: '', colorId: 0 }])
     const [image, setImage] = useState<string>('')
 
     function addLine(after?: number): void {
         let newLines = [...lines]
         if (after !== undefined) {
-            newLines.splice(after + 1, 0, {id: newLines.length, line: ''})
+            newLines.splice(after + 1, 0, {id: newLines.length, line: '', colorId: 0 })
         } else {
-            newLines.push({id: newLines.length, line: ''})
+            newLines.push({id: newLines.length, line: '', colorId: 0 })
         }
         setLines(newLines)
 
         regenerate(newLines)
     }
 
-    // function deleteLine(index: number): void {
-    //     let newLines = [...lines]
-    //     newLines.splice(index, 1)
-    //     setLines(newLines)
+    function lineNextColor(index: number): void {
+        let newLines = [...lines]
+        let line = newLines[index]
+        line.colorId = (line.colorId + 1) % LINE_COLORS.length
+        setLines(newLines)
 
-    //     regenerate(newLines)
-    // }
+        regenerate(newLines)
+    }
 
-    function regenerate(lines: {id: number, line: string}[]): void {
-        let palette: Palette = DEFAULT_PALETTE
-        let lineData = lines.map((line) => ({ palette, text: line.line }))
+    function deleteLine(index: number): void {
+        let newLines = [...lines]
+        newLines.splice(index, 1)
+        setLines(newLines)
+
+        regenerate(newLines)
+    }
+
+    function regenerate(lines: {id: number, line: string, colorId: number}[]): void {
+        let lineData = lines.map((line) => ({ palette: LINE_COLORS[line.colorId], text: line.line }))
         getLines(lineData).then((image) => {
             image.resize({ w: 4 * image.bitmap.width, mode: ResizeStrategy.NEAREST_NEIGHBOR })
             image.getBase64("image/png").then((base64) => {
@@ -64,7 +82,7 @@ function LineGroup(): ReactNode {
                 <ul>
                     {lines.map(({id}, index) => (
                         <li key={id}>
-                            <LineBuilder index={index} onChanged={onChanged} addLine={addLine} />
+                            <LineBuilder index={index} onChanged={onChanged} addLine={addLine} deleteLine={deleteLine} lineNextColor={lineNextColor} />
                         </li>
                     ))}
                 </ul>
@@ -78,7 +96,7 @@ function LineGroup(): ReactNode {
     )
 }
 
-function LineBuilder({ index, onChanged, addLine }: { index: number, onChanged: (index: number, line: string) => void, addLine: (after?: number) => void }): ReactNode {
+function LineBuilder({ index, onChanged, addLine, deleteLine, lineNextColor }: { index: number, onChanged: (index: number, line: string) => void, addLine: (after?: number) => void, deleteLine: (index: number) => void, lineNextColor: (index: number) => void }): ReactNode {
     function updateParent(e: ChangeEvent<HTMLInputElement>): void {
         let text = e.target.value
         onChanged(index, text)
@@ -93,6 +111,8 @@ function LineBuilder({ index, onChanged, addLine }: { index: number, onChanged: 
                         addLine(index)
                     }
                 }}></input>
+                <button onClick={() => {deleteLine(index)}}>X</button>
+                <button onClick={() => {lineNextColor(index)}}>C</button>
             </div>
         </>)
 }
