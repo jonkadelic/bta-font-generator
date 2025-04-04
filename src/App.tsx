@@ -111,7 +111,7 @@ function LineBuilder({ index, onChanged, addLine, deleteLine, lineNextColor }: {
                         addLine(index)
                     }
                 }}></input>
-                <button onClick={() => {deleteLine(index)}}>X</button>
+                {/* <button onClick={() => {deleteLine(index)}}>X</button> */}
                 <button onClick={() => {lineNextColor(index)}}>C</button>
             </div>
         </>)
