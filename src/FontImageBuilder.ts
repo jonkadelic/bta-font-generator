@@ -19,10 +19,10 @@ export class Color {
 
 export async function buildFontImage(palette: {c0: Color, c1: Color, c2: Color, c3: Color} | Palette): Promise<JimpInstance> {
     let images: JimpInstance[] = (await Promise.all([
-        Jimp.read("/0.png"),
-        Jimp.read("/1.png"),
-        Jimp.read("/2.png"),
-        Jimp.read("/3.png")
+        Jimp.read("./0.png"),
+        Jimp.read("./1.png"),
+        Jimp.read("./2.png"),
+        Jimp.read("./3.png")
     ])) as JimpInstance[]
 
     const black = new Color(0, 0, 0)
