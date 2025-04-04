@@ -1,4 +1,4 @@
-import React, { ChangeEvent, ReactNode, useReducer, useState } from 'react'
+import { ChangeEvent, ReactNode, useState } from 'react'
 import './App.css'
 import { DEFAULT_PALETTE, Palette } from './Palette'
 import { buildText } from './TextBuilder'
@@ -31,13 +31,13 @@ function LineGroup(): ReactNode {
         regenerate(newLines)
     }
 
-    function deleteLine(index: number): void {
-        let newLines = [...lines]
-        newLines.splice(index, 1)
-        setLines(newLines)
+    // function deleteLine(index: number): void {
+    //     let newLines = [...lines]
+    //     newLines.splice(index, 1)
+    //     setLines(newLines)
 
-        regenerate(newLines)
-    }
+    //     regenerate(newLines)
+    // }
 
     function regenerate(lines: {id: number, line: string}[]): void {
         let palette: Palette = DEFAULT_PALETTE
