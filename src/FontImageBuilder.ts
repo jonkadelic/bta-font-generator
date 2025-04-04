@@ -18,29 +18,19 @@ export class Color {
 }
 
 export async function buildFontImage(palette: {c0: Color, c1: Color, c2: Color, c3: Color} | Palette): Promise<JimpInstance> {
-    let images: JimpInstance[] = (await Promise.all([
-        Jimp.read("./0.png"),
-        Jimp.read("./1.png"),
-        Jimp.read("./2.png"),
-        Jimp.read("./3.png")
-    ])) as JimpInstance[]
+    let image: JimpInstance = await Jimp.read("./font.png") as JimpInstance
 
-    const black = new Color(0, 0, 0)
+    const c0 = new Color(0, 0, 0)
+    const c1 = new Color(89, 85, 88)
+    const c2 = new Color(171, 161, 158)
+    const c3 = new Color(225, 220, 215)
 
-    let processedImages: JimpInstance[] = await Promise.all([
-        replaceColor(images[0], black, palette.c0),
-        replaceColor(images[1], black, palette.c1),
-        replaceColor(images[2], black, palette.c2),
-        replaceColor(images[3], black, palette.c3)
-    ])
+    image = await replaceColor(image, c0, palette.c0)
+    image = await replaceColor(image, c1, palette.c1)
+    image = await replaceColor(image, c2, palette.c2)
+    image = await replaceColor(image, c3, palette.c3)
 
-    let combinedImage: JimpInstance = new Jimp({ width: images[0].bitmap.width, height: images[0].bitmap.height })
-    combinedImage.composite(processedImages[0], 0, 0)
-    combinedImage.composite(processedImages[1], 0, 0)
-    combinedImage.composite(processedImages[2], 0, 0)
-    combinedImage.composite(processedImages[3], 0, 0)
-
-    return combinedImage
+    return image
 }
 
 async function replaceColor(image: JimpInstance, targetColor: Color, replaceColor: Color): Promise<JimpInstance> {
